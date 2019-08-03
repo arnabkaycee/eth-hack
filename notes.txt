@@ -1,2 +1,224 @@
+======================================================================================================================
+GIT REPO URL
+======================================================================================================================
+https://RBEIBCInnovation@dev.azure.com/RBEIBCInnovation/RBEIBCInnovation/_git/DBTrainDemo
+
+======================================================================================================================
+GANACHE MNEMONIC
+======================================================================================================================
 between vacant meadow invest minute tenant mobile front spring hungry globe inspire
+
+======================================================================================================================
+GANACHE COMMANDS
+======================================================================================================================
+
+ganache-cli -d -l 999999999 -m "between vacant meadow invest minute tenant mobile front spring hungry globe inspire"
+
+======================================================================================================================
+GCLOUD IP
+======================================================================================================================
+IP Address: 35.246.152.112
+
+======================================================================================================================
+NPM INSTALLATION PREREQUISITES
+======================================================================================================================
+sudo apt install python
+sudo apt install build-essential
+
+======================================================================================================================
+TMUX COMMANDS - TO RUN IN BACKGROUND
+======================================================================================================================
+https://hackernoon.com/a-gentle-introduction-to-tmux-8d784c404340
+
+Start new named session:
+tmux new -s [session name]
+
+Detach from session:
+ctrl+b d
+
+List sessions:
+tmux ls
+
+Attach to named session:
+tmux a -t [name of session]
+
+Kill named session:
+tmux kill-session -t [name of session]
+
+Split panes horizontally:
+ctrl+b "
+
+Split panes vertically:
+ctrl+b %
+
+Kill current pane:
+ctrl+b x
+
+Move to another pane:
+ctrl+b [arrow key]
+
+Cycle through panes:
+ctrl+b o
+
+Cycle just between previous and current pane:
+ctrl+b ;
+
+Kill tmux server, along with all sessions:
+tmux kill-server
+
+---------
+======================================================================================================================
+Start Google chrome without security
+======================================================================================================================
+
+google-chrome  --user-data-dir=/tmp --disable-web-security
+
+
+======================================================================================================================
+COUCH DB INSTALLATION ON RASPBERRY PI
+======================================================================================================================
+https://github.com/apache/couchdb/releases/tag/2.3.0
+http://tplinkwifi.net/
+https://andyfelong.com/2017/09/couchdb-2-1-on-raspberry-pi-raspbian-stretch/
+
+
+
+cd /home/couchdb/etc
+sudo -i -u couchdb /home/couchdb/bin/couchdb
+
+START CouchDb:
+sudo -i -u couchdb /home/couchdb/bin/couchdb
+
+Issues:
+1. After setting up couch db ensure that you go to settings and select "configure for single node". Else it will trow a write permission required and no documents will be written on the db
+2. Keep the db port as 5000
+
+
+
+
+https://www.dexterindustries.com/howto/run-a-program-on-your-raspberry-pi-at-startup/
+
+
+sudo vim /lib/systemd/system/couchdb.service
+
+[Unit]
+Description=Couchdb service
+After=network.target
+
+[Service]
+Type=simple
+User=couchdb
+ExecStart=/home/couchdb/bin/couchdb -o /dev/stdout -e /dev/stderr
+Restart=always
+
+
+sudo chmod 644 /lib/systemd/system/couchdb.service
+
+sudo systemctl daemon-reload
+sudo systemctl enable couchdb.service
+
+
+OPERATIONS
+
+sudo service couchdb start
+sudo service couchdb stop
+sudo service couchdb restart
+sudo service couchdb status
+
+
+======================================================================================================================
+PYTHON AGENT INSTALLATION PRE REQUISITES
+======================================================================================================================
+
+Python3 Packages:
+connexion
+Flask-RESTful
+requests
+python_dateutil
+
+setuptools
+
+
+=====================================================================================================================
+NODE JS INSTALLATION ON RASPBERRY PI
+=====================================================================================================================
+Node:
+wget https://nodejs.org/dist/v10.16.0/node-v10.16.0-linux-armv7l.tar.xz
+tar -xvf node-v10.16.0-linux-armv7l.tar.xz
+cd node-v10.16.0-linux-armv7l/
+sudo cp -R * /usr/local/
+
+ARM Info:
+cat /proc/cpuinfo
+
+
+=====================================================================================================================
+GANACHE AND TRUFFLE INSTALLATION
+=====================================================================================================================
+
+Ganache & Truffle:
+sudo npm i -g ganache-cli
+sudo npm i -g truffle
+
+
+=====================================================================================================================
+GOOGLE CHROME REMOTE DEBUG
+=====================================================================================================================
+
+chrome-devtools://devtools/bundled/inspector.html?experiments=true&v8only=true&ws=192.168.1.50:9229/bed1b6fc-84ac-4c30-ac15-f6e5a05e9a30
+
+pi@pi1:~/DBTrainDemo $ node --inspect-brk=0.0.0.0:9229 index.js
+Debugger listening on ws://0.0.0.0:9229/bed1b6fc-84ac-4c30-ac15-f6e5a05e9a30
+For help, see: https://nodejs.org/en/docs/inspector
+
+
+
+=====================================================================================================================
+MISCELLANEOUS INFORMATION
+=====================================================================================================================
+
+Collabedit: mcqp6
+efff67xbdwjxoesuwoy4kw5kb6ja6hlisqrjkcaau7ldgxppuvxa
+
+
+curl -X POST \
+  http://localhost:8100/v1/requestBid \
+  -H 'Accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -H 'Postman-Token: d392c5f6-2c7c-4359-9126-3fd03acb3d71' \
+  -H 'cache-control: no-cache' \
+  -d '{
+    "auctionId" : "AUC9876"
+}'
+
+=====================================================================================================================
+GETH COMMANDS
+=====================================================================================================================
+geth --datadir .ethereum/ account new
+
+Address: {d9329b089532fb30d50364729841d2213d2153cd}
+Address: {0b8a3c08a5cfae97d9304a9bdaad6a6db78a3d72}
+
+Password: password
+
+network name : db
+
+locking : d9329b089532fb30d50364729841d2213d2153cd
+prefunded : d9329b089532fb30d50364729841d2213d2153cd
+
+------------------------
+Initialize ledger
+------------------------
+
+geth --datadir .ethereum/ init genesis.json
+
+-----------------
+START GETH
+-----------------
+geth --nodiscover --networkid 1 --datadir .ethereum/ --unlock d9329b089532fb30d50364729841d2213d2153cd --mine --rpc --rpcapi eth,net,web3
+
+
+
+geth --nodiscover --networkid 1 --datadir .ethereum/ --unlock d9329b089532fb30d50364729841d2213d2153cd --mine --rpc --rpcapi eth,net,web3 --verbosity 2
+
 
