@@ -1,0 +1,405 @@
+---
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: "Water API"
+host: "localhost:8080"
+basePath: "/v1"
+tags:
+  - name: "user"
+    description: "Everything about your User"
+  - name: "auction"
+    description: "auction"
+  - name: "device"
+    description: "usage"
+schemes:
+  - "http"
+paths:
+  /user:
+    get:
+      tags:
+        - "user"
+      operationId: "getUsers"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "userId"
+          in: "query"
+          required: false
+          type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/User"
+        500:
+          description: "unsuccessful operation"
+      x-swagger-router-controller: "User"
+    post:
+      tags:
+        - "user"
+      summary: "Create user"
+      description: "This can only be done by NGO."
+      operationId: "createUser"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Created user object"
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        200:
+          description: "successful operation"
+        500:
+          description: "unsuccessful operation"
+      x-swagger-router-controller: "User"
+  /auction:
+    get:
+      tags:
+        - "auction"
+      operationId: "getAuction"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "auctionId"
+          in: "query"
+          required: false
+          type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Auction"
+        500:
+          description: "unsuccessful operation"
+      x-swagger-router-controller: "Auction"
+    post:
+      tags:
+        - "auction"
+      summary: "Create auction"
+      description: "This can only be done by NGO"
+      operationId: "createAuction"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/Auction"
+      responses:
+        200:
+          description: "successful operation"
+        500:
+          description: "unsuccessful operation"
+      x-swagger-router-controller: "Auction"
+  /auction/close:
+    post:
+      tags:
+        - "auction"
+      description: "This can only be done by NGO"
+      operationId: "closeAuction"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/Auction"
+      responses:
+        200:
+          description: "successful operation"
+        500:
+          description: "unsuccessful operation"
+      x-swagger-router-controller: "Auction"
+  /auction/closePledge:
+    post:
+      tags:
+        - "auction"
+      description: "This can only be done by NGO"
+      operationId: "closeAuctionPledge"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/Auction"
+      responses:
+        200:
+          description: "successful operation"
+        500:
+          description: "unsuccessful operation"
+      x-swagger-router-controller: "Auction"
+  /auction/bid:
+    get:
+      tags:
+        - "auction"
+      operationId: "getBids"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "auctionId"
+          in: "query"
+          required: false
+          type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Bid"
+        500:
+          description: "unsuccessful operation"
+      x-swagger-router-controller: "Auction"
+    post:
+      tags:
+        - "auction"
+      summary: "Create bid"
+      operationId: "createBid"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/Bid"
+      responses:
+        200:
+          description: "successful operation"
+        500:
+          description: "unsuccessful operation"
+      x-swagger-router-controller: "Auction"
+  /auction/bid/wins:
+    get:
+      tags:
+        - "auction"
+      operationId: "getWinningBids"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "auctionId"
+          in: "query"
+          required: false
+          type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Bid"
+        500:
+          description: "unsuccessful operation"
+      x-swagger-router-controller: "Auction"
+  /device/usage:
+    get:
+      tags:
+        - "device"
+      operationId: "getDeviceUsage"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "deviceId"
+          in: "query"
+          required: false
+          type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/DeviceUsageStats"
+        500:
+          description: "unsuccessful operation"
+      x-swagger-router-controller: "Device"
+    post:
+      tags:
+        - "device"
+      summary: "logUsageStats"
+      description: "This can only be done by NGO"
+      operationId: "logUsageStats"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/body"
+      responses:
+        200:
+          description: "successful operation"
+        500:
+          description: "unsuccessful operation"
+      x-swagger-router-controller: "Device"
+  /notification:
+    get:
+      tags:
+        - "notification"
+      operationId: "getNotification"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "sequenceId"
+          in: "query"
+          description: "exact sequence id, fetches only one result"
+          required: false
+          type: "string"
+        - name: "offsetSequenceId"
+          in: "query"
+          description: "fetch the results where `sequenceId` >= `offsetSequenceId`"
+          required: false
+          type: "string"
+        - name: "limit"
+          in: "query"
+          description: "limit the number of results starting from the offset starting\
+          \ with the sequence id denoted by `offsetSequenceId`"
+          required: false
+          type: "integer"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Notifications"
+        500:
+          description: "unsuccessful operation"
+      x-swagger-router-controller: "Notification"
+definitions:
+  User:
+    type: "object"
+    properties:
+      userId:
+        type: "string"
+      address:
+        type: "string"
+      userType:
+        type: "integer"
+      walletBalance:
+        type: "integer"
+      deviceId:
+        type: "string"
+    example:
+      address: "address"
+      walletBalance: 6
+      userType: 0
+      userId: "userId"
+      deviceId: "deviceId"
+  Auction:
+    type: "object"
+    properties:
+      auctionId:
+        type: "string"
+      users:
+        type: "array"
+        items:
+          type: "string"
+      totalIncentive:
+        type: "integer"
+      litreGoalSaving:
+        type: "integer"
+      bidStartTimestamp:
+        type: "integer"
+      bidEndTimestamp:
+        type: "integer"
+      savingStartTimestamp:
+        type: "integer"
+      savingEndTimestamp:
+        type: "integer"
+    example:
+      auctionId: "auctionId"
+      bidStartTimestamp: 1
+      savingEndTimestamp: 2
+      totalIncentive: 0
+      litreGoalSaving: 6
+      savingStartTimestamp: 5
+      users:
+        - "users"
+        - "users"
+      bidEndTimestamp: 5
+  Bid:
+    type: "object"
+    properties:
+      bidId:
+        type: "string"
+      auctionId:
+        type: "string"
+      userId:
+        type: "string"
+      bidAmount:
+        type: "integer"
+      litreSaving:
+        type: "integer"
+    example:
+      auctionId: "auctionId"
+      bidAmount: 0
+      litreSaving: 6
+      userId: "userId"
+      bidId: "bidId"
+  DeviceUsageStats:
+    type: "object"
+    properties:
+      deviceId:
+        type: "string"
+      timestamp:
+        type: "integer"
+      litresConsumed:
+        type: "integer"
+      usageId:
+        type: "string"
+    example:
+      usageId: "usageId"
+      deviceId: "deviceId"
+      watt: 6
+      timestamp: 0
+  Notifications:
+    type: "object"
+    properties:
+      sequenceId:
+        type: "integer"
+      detail:
+        type: "string"
+      status:
+        type: "integer"
+        example: "01 - Auction Created, 02 - Bid Placed, 03 - Auction Closed, 04 -\
+          \ Notified Winner, 05 - Notified Not Winner, 06 - Pledge Kept, 07 - Pledge\
+          \ Not Kept, 08 - Wallet Debited"
+    example:
+      detail: "detail"
+      sequenceId: 0
+  ApiResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      type:
+        type: "string"
+      message:
+        type: "string"
+  body:
+    type: "object"
+    properties:
+      literConsumed:
+        type: "integer"
+      usageId:
+        type: "string"
+      userId:
+        type: "string"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"

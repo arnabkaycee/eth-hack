@@ -1,0 +1,24 @@
+sudo wget https://nodejs.org/dist/v10.16.0/node-v10.16.0-linux-armv7l.tar.xz
+
+sudo tar --strip-components 1 -xf node-v10.16.0-linux-armv7l.tar.xz
+sudo mkdir node
+sudo mv bin include CHANGELOG.md lib LICENSE README.md share node
+cd node
+sudo cp -R * /usr/local/
+node -v
+npm i -g ganache-cli
+npm i -g truffle
+sudo apt install vim
+sudo apt install tmux
+
+git clone <Repo>
+
+chmod +x startServices.sh
+cd bcx19-shakti
+npm install
+cd agents
+sudo python3 setup.py install
+sudo pip install matplotlib
+sudo pip install shutil
+sudo pip3 install plotly
+

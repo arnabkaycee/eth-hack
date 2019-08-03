@@ -1,0 +1,14 @@
+{
+  "node": {
+    "address": "127.0.0.1",
+    "port": 8545
+  },
+  "app": {
+    "energyAuction": "0x71aF7D44CC214fAD75287D729756Adfb4E26aea5"
+  },
+  "userAccounts": {
+    "ngo": "0x895aE9efB156e388Bd324e466576285906d20827",
+    "usr002" : "0x263a5223a294C64b5E48Cab164e95131938C87ea",
+    "usr001" : "0x9aeC04AEa530111F337f3D121488f22383098627"
+  }
+}
