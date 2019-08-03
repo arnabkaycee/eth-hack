@@ -2,9 +2,9 @@
 const Web3 = require('web3');
 
 const config = require('../config/config.json');
-const energyAuctionContract = require("../build/contracts/EnergyAuction.json");
+const waterAuctionContract = require("../build/contracts/WaterAuction.json");
 const web3 = new Web3(new Web3.providers.WebsocketProvider(`ws://${config.node.address}:${config.node.port}`));
-const eaContract = new web3.eth.Contract(energyAuctionContract.abi, config.app.energyAuction);
+const eaContract = new web3.eth.Contract(waterAuctionContract.abi, config.app.waterAuction);
 
 /**
  *
@@ -59,7 +59,7 @@ exports.logUsageStats = function(body) {
   return new Promise(function(resolve, reject) {
     
     const usageId = web3.utils.padRight(web3.utils.utf8ToHex(body.usageId),64);
-    const watt = parseInt(body.watt);
+    const watt = parseInt(body.literConsumed);
     const userId = body.userId;
 
     const registerDeviceUsageCall = eaContract.methods.registerDeviceUsage(usageId, watt).send({

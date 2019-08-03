@@ -1,1 +1,0 @@
-curl -s GET "https://things.eu-1.bosch-iot-suite.com/api/2/things/com.bosch.bcx2019%3AHOME-hdm%3AHomeMaticIP%3A3014F711A0000493985923BC" -H "accept: application/json" -H "x-cr-api-token: 17e4cb0b0d094b3aa4fe46ca7baa88a4" -H "Authorization: Basic SEFYXFZlbm9tb3VzU2V0Ol5VNDQ1UU1fVW1iMkU4YQ=="

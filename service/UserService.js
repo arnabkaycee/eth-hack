@@ -2,9 +2,9 @@
 const Web3 = require('web3');
 
 const config = require('../config/config.json');
-const energyAuctionContract = require("../build/contracts/EnergyAuction.json");
+const waterAuctionContract = require("../build/contracts/WaterAuction.json");
 const web3 = new Web3(new Web3.providers.WebsocketProvider(`ws://${config.node.address}:${config.node.port}`));
-const eaContract = new web3.eth.Contract(energyAuctionContract.abi, config.app.energyAuction);
+const eaContract = new web3.eth.Contract(waterAuctionContract.abi, config.app.waterAuction);
 /**
  * Create user
  * This can only be done by the logged in user.

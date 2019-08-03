@@ -3,7 +3,7 @@ pragma solidity ^0.5.0;
 import "./ERC20.sol";
 import "./math/SafeMath.sol";
 
-contract EnergyAuction {
+contract WaterAuction {
 
     using SafeMath for uint256;
 
@@ -11,6 +11,7 @@ contract EnergyAuction {
     enum DeviceType {NONE, HVAC, Refrigerator} DeviceType dt;
     enum UserType {NGO, END_USER} UserType ut;
 
+    uint constant MAX_LEN = 2**8;
     //ERC20 private erc20;
 
     constructor () public {
@@ -45,8 +46,8 @@ contract EnergyAuction {
     //mapping (bytes32 => bytes32) notesMapping;
 
     //event defintions
-    event DeviceUsageRegistered(bytes32 indexed _usageId, bytes32 indexed _deviceId, uint256 _timestamp, uint256 _watt);
-    event PledgeSuccessful(bytes32 indexed _auctionId, uint256 _totalSavedWatt, uint256 _totalPayout);
+    event DeviceUsageRegistered(bytes32 indexed _usageId, bytes32 indexed _deviceId, uint256 _timestamp, uint256 _litre);
+    event PledgeSuccessful(bytes32 indexed _auctionId, uint256 _totalSavedlitre, uint256 _totalPayout);
 
     //user struct
     struct User{
@@ -64,7 +65,7 @@ contract EnergyAuction {
     struct Auction{
         bytes32 auctionId;
         uint256 totalIncentive;
-        uint256 wattHourGoalSavings;
+        uint256 litreHourGoalSavings;
         uint256 bidStartTimestamp;
         uint256 bidEndTimestamp;
         uint256 offStartTimestamp;
@@ -74,15 +75,15 @@ contract EnergyAuction {
     struct Bid {
         bytes32 bidId;
         address userAddress;
-        bytes32 bidAmount;
+        bytes bidAmount;
         uint256 timestampFrom;
         uint256 timestampTo;
-        bytes32 watt;
+        bytes litre;
     }
     //bid result struct
     // struct BidResult{
     //     bytes32 auctionId;
-    //     uint256 savedWattHour;
+    //     uint256 savedlitreHour;
     //     uint256 totalPayout;
     // }
     //device usage struct
@@ -90,7 +91,7 @@ contract EnergyAuction {
         bytes32 usageId;
         bytes32 deviceId;
         uint256 timestamp;
-        uint256 watt;
+        uint256 litre;
     }
 
     modifier onlyAdmin() {
@@ -109,13 +110,13 @@ contract EnergyAuction {
         userRegistry[_userAddress] = user;
     }
 
-    function createAuction(bytes32 _auctionId, uint256 _totalIncentive, uint256 _wattHourGoalSavings,
+    function createAuction(bytes32 _auctionId, uint256 _totalIncentive, uint256 _litreHourGoalSavings,
         uint256 _bidStartTimestamp,uint256 _bidEndTimestamp,uint256 _offStartTimestamp,uint256 _offEndTimeStamp, address[] memory _users) public {
 
         Auction memory auction = Auction({
             auctionId : _auctionId,
             totalIncentive : _totalIncentive,
-            wattHourGoalSavings : _wattHourGoalSavings,
+            litreHourGoalSavings : _litreHourGoalSavings,
             bidStartTimestamp : _bidStartTimestamp,
             bidEndTimestamp : _bidEndTimestamp,
             offStartTimestamp : _offStartTimestamp,
@@ -127,8 +128,8 @@ contract EnergyAuction {
         auctionRegistry[_auctionId] = auction;
     }
 
-    function placeBid(bytes32 _auctionId, bytes32 _bidId, bytes32 _bidAmount,
-        uint256 _timestampFrom, uint256 _timestampTo, bytes32 _watt) public {
+    function placeBid(bytes32 _auctionId, bytes32 _bidId, bytes memory _bidAmount,
+        uint256 _timestampFrom, uint256 _timestampTo, bytes memory _litre) public {
         Auction memory auction = auctionRegistry[_auctionId];
         //check for time
         uint256 currentTimestamp = block.timestamp;
@@ -148,7 +149,7 @@ contract EnergyAuction {
             bidAmount : _bidAmount,
             timestampFrom : _timestampFrom,
             timestampTo : _timestampTo,
-            watt : _watt
+            litre : _litre
             });
         bidRegistry[_bidId] = bid;
         auctionBidIdsRegistry[_auctionId].push(_bidId);
@@ -156,16 +157,16 @@ contract EnergyAuction {
 
 
 
-    function registerDeviceUsage (bytes32 _usageId, uint256 _watt) public{
+    function registerDeviceUsage (bytes32 _usageId, uint256 _litre) public{
         bytes32 _deviceId = userRegistry[msg.sender].device.deviceId;
         DeviceUsage memory deviceUsage = DeviceUsage ({
             deviceId : _deviceId,
             timestamp: block.timestamp,
-            watt:_watt,
+            litre:_litre,
             usageId : _usageId
             });
         deviceStatsRegistry[_usageId] = deviceUsage;
-        emit DeviceUsageRegistered(_usageId, _deviceId, block.timestamp, _watt);
+        emit DeviceUsageRegistered(_usageId, _deviceId, block.timestamp, _litre);
     }
 
     function getUser(address _userAddress) public returns (bytes32, bytes32, DeviceType, address, UserType, uint256) {
@@ -178,11 +179,11 @@ contract EnergyAuction {
     function getAuction(bytes32 _auctionId) public returns (bytes32, uint256, uint256, uint256, uint256, uint256, uint256) {
         Auction memory auction = auctionRegistry[_auctionId];
         return (auction.auctionId, auction.totalIncentive,
-        auction.wattHourGoalSavings, auction.bidStartTimestamp,
+        auction.litreHourGoalSavings, auction.bidStartTimestamp,
         auction.bidEndTimestamp, auction.offStartTimestamp, auction.offEndTimeStamp);
     }
 
-    function getAuctionBids (bytes32 _auctionId)  public returns (bytes32[] memory, bytes32[] memory, bytes32[] memory) {
+    function getAuctionBids (bytes32 _auctionId)  public returns (bytes32[] memory, bytes memory, bytes memory) {
         //check if bid duration is closed
         Auction memory auction = auctionRegistry[_auctionId];
 
@@ -190,16 +191,16 @@ contract EnergyAuction {
 //            "Bids should be fetched after bid is closed");
 
         bytes32[] memory bidIds = auctionBidIdsRegistry[_auctionId];
-        bytes32[] memory bidAmount = new bytes32[](bidIds.length);
-        bytes32[] memory wattHour = new bytes32[](bidIds.length);
+        uint256[] memory bidAmount = new uint256[](bidIds.length);
+        uint256[] memory litreHour = new uint256[](bidIds.length);
 
         for(uint i = 0; i<bidIds.length; i++) {
             Bid memory bid = bidRegistry[bidIds[i]];
             bidIds[i] = bid.bidId;
             bidAmount[i] = bid.bidAmount;
-            wattHour[i] = bid.watt;
+            litreHour[i] = bid.litre;
         }
-        return (bidIds, bidAmount, wattHour);
+        return (bidIds, bidAmount, litreHour);
 
     }
 
@@ -207,14 +208,14 @@ contract EnergyAuction {
 
     //     DeviceUsage[] memory deviceUsages = deviceStatsRegistry[_deviceId];
     //     uint256[] memory timestamp = new uint256[](deviceUsages.length);
-    //     uint256[] memory watt = new uint256[](deviceUsages.length);
+    //     uint256[] memory litre = new uint256[](deviceUsages.length);
 
     //     for(uint i = 0; i<deviceUsages.length; i++) {
     //         timestamp[i] = deviceUsages[i].timestamp;
-    //         watt[i] = deviceUsages[i].watt;
+    //         litre[i] = deviceUsages[i].litre;
 
     //     }
-    //     return (timestamp, watt);
+    //     return (timestamp, litre);
     // }
     //TODO change
     function registerWinningBids(bytes32 _auctionId, bytes32[] memory _bidIds) public {
@@ -227,17 +228,17 @@ contract EnergyAuction {
         // }
         // BidResult memory bidResult = BidResult({
         //     auctionId : _auctionId,
-        //     savedWattHour : _savedWattHours,
+        //     savedlitreHour : _savedlitreHours,
         //     totalPayout : totalPayout
         // });
         // bidResults[_auctionId] = bidResult;
         //emit BidClosed(_auctionId);
     }
 
-    function getWinningBids(bytes32 _auctionId) public returns (bytes32[] memory, bytes32[] memory, bytes32[] memory, bytes32[] memory) {
+    function getWinningBids(bytes32 _auctionId) public returns (bytes32[] memory, bytes32[] memory, bytes[] memory, bytes[] memory) {
         bytes32[] memory bidIds = winningBidsRegistry[_auctionId];
-        bytes32[] memory bidAmount = new bytes32[](bidIds.length);
-        bytes32[] memory wattHour = new bytes32[](bidIds.length);
+        uint256[] memory bidAmount = new uint256[](bidIds.length);
+        uint256[] memory litreHour = new uint256[](bidIds.length);
         bytes32[] memory userIds = new bytes32[](bidIds.length);
 
         for(uint256 i = 0; i<bidIds.length; i++) {
@@ -245,9 +246,9 @@ contract EnergyAuction {
             bidIds[i] = bid.bidId;
             bidAmount[i] = bid.bidAmount;
             userIds[i] = userRegistry[bid.userAddress].userId;
-            wattHour[i] = bid.watt;
+            litreHour[i] = bid.litre;
         }
-        return (bidIds, userIds, bidAmount, wattHour);
+        return (bidIds, userIds, bidAmount, litreHour);
     }
 
 
@@ -282,7 +283,7 @@ contract EnergyAuction {
 //        }
 //        for(uint256 i = 0; i<_usageIds.length; i++){
 //            DeviceUsage memory deviceUsage = deviceStatsRegistry[_usageIds[i]];
-//            totalSavings += deviceUsage.watt;
+//            totalSavings += deviceUsage.litre;
 //        }
 //        emit PledgeSuccessful(_auctionId, totalSavings, totalPayout);
 //    }

@@ -4,7 +4,7 @@
     "port": 8545
   },
   "app": {
-    "energyAuction": "0x71aF7D44CC214fAD75287D729756Adfb4E26aea5"
+    "waterAuction": "0x71aF7D44CC214fAD75287D729756Adfb4E26aea5"
   },
   "userAccounts": {
     "ngo": "0x895aE9efB156e388Bd324e466576285906d20827",
