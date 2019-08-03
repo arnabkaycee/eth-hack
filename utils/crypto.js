@@ -1,5 +1,15 @@
 const ethCrypto = require('eth-crypto');
 const secp256k1 = require('@aztec/secp256k1');
+
+const Web3 = require('web3');
+const config = require('../config/config.json');
+
+const energyAuctionContract = require("../build/contracts/EnergyAuction.json");
+const web3 = new Web3(new Web3.providers.WebsocketProvider(`ws://${config.node.address}:${config.node.port}`));
+const eaContract = new web3.eth.Contract(energyAuctionContract.abi, config.app.energyAuction);
+
+
+
 const encryptMessage = async (publicKey, msg) => {
     const encrypted = await ethCrypto.encryptWithPublicKey(
         publicKey.slice(4),
@@ -56,6 +66,23 @@ const validate = async function () {
     console.log(`decrypted : ${decrypted}`);
 
 };
-module.exports = {encryptMessage, decryptMessage, validatePrivateKeyFormat, privateKeyToPublicKey, validate};
+
+const stringToBytes32 = function(str){
+    return web3.utils.padRight(web3.utils.utf8ToHex(str),64);
+};
+
+const bytes32ToString = function(str) {
+    return web3.utils.hexToUtf8(str);
+};
+
+const hexToNumber = function(hexStr) {
+    return web3.utils.hexToNumber(hexStr);
+};
+
+const  numberToHex = function(number) {
+    return web3.utils.numberToHex(numberToHex);
+};
+
+module.exports = {encryptMessage, decryptMessage, validatePrivateKeyFormat, privateKeyToPublicKey, validate, stringToBytes32, bytes32ToString, numberToHex, hexToNumber};
 
 //validate();

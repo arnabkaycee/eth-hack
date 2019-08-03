@@ -1,11 +1,11 @@
 var ResponsePayload = function(code, payload) {
   this.code = code;
   this.payload = payload;
-}
+};
 
 exports.respondWithCode = function(code, payload) {
   return new ResponsePayload(code, payload);
-}
+};
 
 var writeJson = exports.writeJson = function(response, arg1, arg2) {
   var code;
@@ -13,6 +13,12 @@ var writeJson = exports.writeJson = function(response, arg1, arg2) {
 
   if(arg1 && arg1 instanceof ResponsePayload) {
     writeJson(response, arg1.payload, arg1.code);
+    return;
+  }
+
+  if (arg1 && arg1 instanceof Error) {
+    let err = JSON.stringify(arg1, null, 2)
+    writeJson(response, err, 500);
     return;
   }
 
@@ -40,4 +46,4 @@ var writeJson = exports.writeJson = function(response, arg1, arg2) {
   }
   response.writeHead(code, {'Content-Type': 'application/json'});
   response.end(payload);
-}
+};

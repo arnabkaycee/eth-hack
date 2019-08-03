@@ -42,6 +42,7 @@ contract EnergyAuction {
     //mapping from auction id to selected users by the agent
     mapping (bytes32 => mapping (address => bool)) auctionSelectedUsers;
 
+    //mapping (bytes32 => bytes32) notesMapping;
 
     //event defintions
     event DeviceUsageRegistered(bytes32 indexed _usageId, bytes32 indexed _deviceId, uint256 _timestamp, uint256 _watt);
@@ -73,10 +74,10 @@ contract EnergyAuction {
     struct Bid {
         bytes32 bidId;
         address userAddress;
-        uint256 bidAmount;
+        bytes32 bidAmount;
         uint256 timestampFrom;
         uint256 timestampTo;
-        uint256 watt;
+        bytes32 watt;
     }
     //bid result struct
     // struct BidResult{
@@ -126,18 +127,18 @@ contract EnergyAuction {
         auctionRegistry[_auctionId] = auction;
     }
 
-    function placeBid(bytes32 _auctionId, bytes32 _bidId, uint256 _bidAmount,
-        uint256 _timestampFrom, uint256 _timestampTo, uint256 _watt) public {
+    function placeBid(bytes32 _auctionId, bytes32 _bidId, bytes32 _bidAmount,
+        uint256 _timestampFrom, uint256 _timestampTo, bytes32 _watt) public {
         Auction memory auction = auctionRegistry[_auctionId];
         //check for time
         uint256 currentTimestamp = block.timestamp;
 
-        require((auction.bidStartTimestamp<=currentTimestamp&&auction.bidEndTimestamp>=currentTimestamp),
-            "Bid time has passed for auction");
-        require(( _timestampFrom>=auction.offStartTimestamp&&_timestampFrom<=auction.offEndTimeStamp),
-            "Off Start time should fall under auction off timestamp");
-        require(( _timestampTo>=auction.offStartTimestamp && _timestampTo<=auction.offEndTimeStamp),
-            "Off Start time should fall under auction off timestamp");
+//        require((auction.bidStartTimestamp<=currentTimestamp&&auction.bidEndTimestamp>=currentTimestamp),
+//            "Bid time has passed for auction");
+//        require(( _timestampFrom>=auction.offStartTimestamp&&_timestampFrom<=auction.offEndTimeStamp),
+//            "Off Start time should fall under auction off timestamp");
+//        require(( _timestampTo>=auction.offStartTimestamp && _timestampTo<=auction.offEndTimeStamp),
+//            "Off Start time should fall under auction off timestamp");
         //require(( _timestampTo-_timestampFrom > 600000),"Duration should be more than 10 minutes");
         //require(_bidAmount < 2,"Max Bid Amount is 2 tokens");
 
@@ -181,22 +182,22 @@ contract EnergyAuction {
         auction.bidEndTimestamp, auction.offStartTimestamp, auction.offEndTimeStamp);
     }
 
-    function getAuctionBids (bytes32 _auctionId)  public returns (bytes32[] memory, uint256[] memory, uint256[] memory) {
+    function getAuctionBids (bytes32 _auctionId)  public returns (bytes32[] memory, bytes32[] memory, bytes32[] memory) {
         //check if bid duration is closed
         Auction memory auction = auctionRegistry[_auctionId];
 
-        require ((auction.bidStartTimestamp < block.timestamp && block.timestamp > auction.bidEndTimestamp),
-            "Bids should be fetched after bid is closed");
+//        require ((auction.bidStartTimestamp < block.timestamp && block.timestamp > auction.bidEndTimestamp),
+//            "Bids should be fetched after bid is closed");
 
         bytes32[] memory bidIds = auctionBidIdsRegistry[_auctionId];
-        uint256[] memory bidAmount = new uint256[](bidIds.length);
-        uint256[] memory wattHour = new uint256[](bidIds.length);
+        bytes32[] memory bidAmount = new bytes32[](bidIds.length);
+        bytes32[] memory wattHour = new bytes32[](bidIds.length);
 
         for(uint i = 0; i<bidIds.length; i++) {
             Bid memory bid = bidRegistry[bidIds[i]];
             bidIds[i] = bid.bidId;
             bidAmount[i] = bid.bidAmount;
-            wattHour[i] = (bid.timestampTo - bid.timestampFrom) * bid.watt;
+            wattHour[i] = bid.watt;
         }
         return (bidIds, bidAmount, wattHour);
 
@@ -233,10 +234,10 @@ contract EnergyAuction {
         //emit BidClosed(_auctionId);
     }
 
-    function getWinningBids(bytes32 _auctionId) public returns (bytes32[] memory, bytes32[] memory, uint256[] memory, uint256[] memory) {
+    function getWinningBids(bytes32 _auctionId) public returns (bytes32[] memory, bytes32[] memory, bytes32[] memory, bytes32[] memory) {
         bytes32[] memory bidIds = winningBidsRegistry[_auctionId];
-        uint256[] memory bidAmount = new uint256[](bidIds.length);
-        uint256[] memory wattHour = new uint256[](bidIds.length);
+        bytes32[] memory bidAmount = new bytes32[](bidIds.length);
+        bytes32[] memory wattHour = new bytes32[](bidIds.length);
         bytes32[] memory userIds = new bytes32[](bidIds.length);
 
         for(uint256 i = 0; i<bidIds.length; i++) {
@@ -244,7 +245,7 @@ contract EnergyAuction {
             bidIds[i] = bid.bidId;
             bidAmount[i] = bid.bidAmount;
             userIds[i] = userRegistry[bid.userAddress].userId;
-            wattHour[i] = (bid.timestampTo - bid.timestampFrom) * bid.watt;
+            wattHour[i] = bid.watt;
         }
         return (bidIds, userIds, bidAmount, wattHour);
     }
@@ -270,21 +271,21 @@ contract EnergyAuction {
         return (participatingDeviceIds,participatingBidIds,timestampStart,timestampEnd);
     }
 
-    function incentivisePledgeKeepers(bytes32 _auctionId, bytes32[] memory _bidIds, bytes32[] memory _usageIds) public {
-        uint256 totalPayout = 0;
-        uint256 totalSavings = 0;
-        for(uint i = 0; i<_bidIds.length; i++){
-            Bid memory bid = bidRegistry[_bidIds[i]];
-            balanceRegistry[msg.sender] = balanceRegistry[msg.sender].sub(bid.bidAmount);
-            balanceRegistry[bid.userAddress] = balanceRegistry[bid.userAddress].add(bid.bidAmount);
-            totalPayout += bid.bidAmount;
-        }
-        for(uint256 i = 0; i<_usageIds.length; i++){
-            DeviceUsage memory deviceUsage = deviceStatsRegistry[_usageIds[i]];
-            totalSavings += deviceUsage.watt;
-        }
-        emit PledgeSuccessful(_auctionId, totalSavings, totalPayout);
-    }
+//    function incentivisePledgeKeepers(bytes32 _auctionId, bytes32[] memory _bidIds, bytes32[] memory _usageIds) public {
+//        uint256 totalPayout = 0;
+//        uint256 totalSavings = 0;
+//        for(uint i = 0; i<_bidIds.length; i++){
+//            Bid memory bid = bidRegistry[_bidIds[i]];
+//            balanceRegistry[msg.sender] = balanceRegistry[msg.sender].sub(bid.bidAmount);
+//            balanceRegistry[bid.userAddress] = balanceRegistry[bid.userAddress].add(bid.bidAmount);
+//            totalPayout += bid.bidAmount;
+//        }
+//        for(uint256 i = 0; i<_usageIds.length; i++){
+//            DeviceUsage memory deviceUsage = deviceStatsRegistry[_usageIds[i]];
+//            totalSavings += deviceUsage.watt;
+//        }
+//        emit PledgeSuccessful(_auctionId, totalSavings, totalPayout);
+//    }
 
 
 

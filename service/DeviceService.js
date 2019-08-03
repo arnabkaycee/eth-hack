@@ -65,7 +65,7 @@ exports.logUsageStats = function(body) {
     const registerDeviceUsageCall = eaContract.methods.registerDeviceUsage(usageId, watt).send({
       from: userId,
       gasPrice: "200",
-      gas: "999999999"
+      gas: "999999"
     }, (err,txHash)=>{
       if (err) reject (err);
       resolve(txHash)

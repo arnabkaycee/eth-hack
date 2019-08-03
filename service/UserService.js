@@ -25,7 +25,7 @@ exports.createUser = function(body) {
     const createUserCall = eaContract.methods.createUser(userId, userType, address, deviceId, deviceType).send({
       from: config.userAccounts.ngo,
       gasPrice: "200",
-      gas: "999999999"
+      gas: "99999"
     },(err,txHash)=>{
       if (err) reject(err);
       resolve(txHash);
@@ -47,7 +47,7 @@ exports.getUsers = function(userId) {
         
       from: config.userAccounts.ngo,
       gasPrice: "200",
-      gas: "999999999"
+      gas: "99999"
     }, (err, result) => {
 
       if (err) reject(err);
