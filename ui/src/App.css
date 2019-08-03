@@ -1,0 +1,44 @@
+.Container {
+  background: white;
+  box-shadow: 0 0 10px -2px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  height: 100%;
+  align-self: center;
+  justify-self: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.Container > h1 {
+  margin: 1rem;
+  font-weight: 400;
+  color: #2c3e50;
+}
+
+.Button {
+  padding: 1rem;
+  background: var(--primary);
+  font-size: 1.25rem;
+  color: white;
+}
+
+a.Button {
+  text-decoration: none;
+  display: flex;
+  justify-content: center;
+}
+
+button.Button {
+  border: none;
+  cursor: pointer;
+}
+
+button.Button:disabled {
+  background: #b3b3b3;
+  cursor: not-allowed;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}

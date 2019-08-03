@@ -1,0 +1,48 @@
+.Container {
+  grid-area: Create;
+}
+
+#Form {
+  flex: 1;
+  margin: 0 1rem;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 1rem;
+}
+
+.Input > label {
+  color: #0e78c5;
+  margin-bottom: 0.5rem;
+  display: block;
+  font-size: 1.25rem;
+}
+
+.Input input {
+  border: none;
+  border-bottom: 1px solid #0e78c5;
+  padding: 1rem 0.5rem;
+  font-size: 1rem;
+}
+
+.Input input + input {
+  margin-left: 1rem;
+}
+
+#Form > * + * {
+  margin-top: 1rem;
+}
+
+#Form > .Input input {
+  width: 100%;
+}
+
+#Form > div > .Input + .Input {
+  margin-left: 2rem;
+}
+
+#Submit {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}

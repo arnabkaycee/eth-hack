@@ -1,0 +1,9 @@
+#User {
+  flex: 1;
+  display: grid;
+  grid-template: "Notifications Usage" 3fr
+                 "Notifications Pledge" 4fr / 5fr 2fr;
+  grid-gap: 2rem;
+  padding: 2rem;
+  overflow-y: auto;
+}

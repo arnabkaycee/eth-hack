@@ -1,0 +1,44 @@
+.Container {
+  grid-area: Usage;
+}
+
+#Usage {
+  flex: 1;
+  display: flex;
+  padding: 0 1rem 1rem 1rem;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.Column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1 1 50%;
+}
+
+.Column > h3 {
+  color: #0e78c5;
+  font-size: 1.75rem;
+  margin: 0;
+  font-weight: 400;
+}
+
+.Column > span {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.Column > h4 {
+  margin: 0;
+  font-weight: 400;
+}
+
+.more {
+  color: #67b419;
+}
+
+.less {
+  color: #ce3630;
+}

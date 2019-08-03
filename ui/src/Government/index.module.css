@@ -1,0 +1,9 @@
+#Government {
+  display: grid;
+  grid-template: "List Details" 2fr
+                 "List Create" 3fr / 5fr 3fr;
+  grid-gap: 2rem;
+  padding: 2rem;
+  overflow-y: auto;
+  flex: 1;
+}

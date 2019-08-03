@@ -1,0 +1,75 @@
+.Container {
+  grid-area: Details;
+  max-height: 20rem;
+}
+
+#Details {
+  flex: 1;
+  padding: 0 1rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+#ListHeader {
+  display: flex;
+  margin-bottom: 1rem;
+}
+
+#ListHeader > div {
+  font-size: 1.25rem;
+  color: var(--primary);
+  text-align: center;
+}
+
+#ListHeader > div:first-child {
+  width: 25%;
+}
+
+#ListHeader > div:nth-child(2) {
+  width: 25%;
+}
+
+#ListHeader > div:nth-child(3) {
+  width: 25%;
+}
+
+#ListHeader > div:last-child {
+  width: 25%;
+}
+
+#BidList {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.Bid {
+  display: flex;
+  align-items: flex-end;
+  height: 3rem;
+  padding: 1rem 0;
+}
+
+.Bid > * {
+  text-align: center;
+}
+
+.Bid > *:first-child {
+  color: var(--info);
+  font-size: 1.25rem;
+  width: 25%;
+}
+
+.Bid > *:nth-child(2) {
+  width: 25%;
+}
+
+.Bid > *:nth-child(3) {
+  width: 25%;
+}
+
+.Bid > *:last-child {
+  width: 25%;
+}

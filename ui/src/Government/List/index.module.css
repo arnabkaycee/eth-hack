@@ -1,0 +1,71 @@
+.Container {
+  grid-area: List;
+}
+
+.Title {
+  margin: 1rem;
+  font-weight: 400;
+}
+
+#Auctions {
+  flex: 1;
+  padding: 0 1rem 1rem 1rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+#AuctionHeader {
+  display: flex;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+
+#AuctionHeader > * {
+  width: 20%;
+  text-align: center;
+  color: var(--primary);
+  font-size: 1.25rem;
+}
+
+.Auction {
+  cursor: pointer;
+  display: flex;
+  align-items: flex-end;
+  min-height: 3rem;
+  padding: 1rem 0;
+}
+
+.Auction.selected {
+  background: var(--light);
+}
+
+.Auction > * {
+  width: 20%;
+  text-align: center;
+  font-size: 1.25rem;
+}
+
+.Auction > *:first-child {
+  color: var(--info);
+}
+
+.Status {
+  color: white;
+  font-size: 1rem;
+  padding: 0 0.25rem;
+  border-radius: 0.25rem;
+  align-self: center;
+}
+
+.future {
+  background: var(--cyan);
+}
+
+.present {
+  background: var(--green);
+}
+
+.past {
+  background: var(--red);
+}
