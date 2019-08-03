@@ -1,5 +1,5 @@
 const EnergyAuction = artifacts.require("EnergyAuction");
-
+const path = require('path');
 const config = require("../config/config.json");
 const fs = require('fs');
 
