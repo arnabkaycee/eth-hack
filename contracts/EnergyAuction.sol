@@ -5,10 +5,11 @@ import "./math/SafeMath.sol";
 
 contract EnergyAuction {
 
-using SafeMath for uint256;
+    using SafeMath for uint256;
 
-//----------------ENUM DECLARATIONS------------------
-enum UserType {NGO, END_USER} UserType ut;
+    //----------------ENUM DECLARATIONS------------------
+    enum DeviceType {NONE, HVAC, Refrigerator} DeviceType dt;
+    enum UserType {NGO, END_USER} UserType ut;
 
     //ERC20 private erc20;
 
@@ -56,21 +57,26 @@ enum UserType {NGO, END_USER} UserType ut;
     //device struct
     struct Device{
         bytes32 deviceId;
+        DeviceType deviceType;
     }
     //auction struct
     struct Auction{
         bytes32 auctionId;
         uint256 totalIncentive;
-        uint256 litreGoalSavings;
+        uint256 wattHourGoalSavings;
         uint256 bidStartTimestamp;
         uint256 bidEndTimestamp;
+        uint256 offStartTimestamp;
+        uint256 offEndTimeStamp;
     }
     //bid struct
     struct Bid {
         bytes32 bidId;
         address userAddress;
         uint256 bidAmount;
-        uint256 litres;
+        uint256 timestampFrom;
+        uint256 timestampTo;
+        uint256 watt;
     }
     //bid result struct
     // struct BidResult{
@@ -80,12 +86,12 @@ enum UserType {NGO, END_USER} UserType ut;
     // }
     //device usage struct
     struct DeviceUsage {
-         bytes32 usageId;
-         bytes32 deviceId;
-         uint256 timestamp;
-         uint256 litres;
+        bytes32 usageId;
+        bytes32 deviceId;
+        uint256 timestamp;
+        uint256 watt;
     }
-    
+
     modifier onlyAdmin() {
         User memory invokingUser = userRegistry[msg.sender];
         require(invokingUser.userType == UserType.NGO, "Only NGO type of User can do this operation");
@@ -93,12 +99,12 @@ enum UserType {NGO, END_USER} UserType ut;
     }
 
     //Fuctions related to operations on onboarding
-    function createUser(bytes32 _userId, UserType _userType, address _userAddress, bytes32 _deviceId) public onlyAdmin{
+    function createUser(bytes32 _userId, UserType _userType, address _userAddress, bytes32 _deviceId, DeviceType _deviceType) public onlyAdmin{
         User memory user = User({
             userId:_userId,
             userType:_userType,
             userAddress:_userAddress,
-            device : Device(_deviceId)});
+            device : Device(_deviceId,_deviceType)});
         userRegistry[_userAddress] = user;
     }
 
@@ -108,12 +114,12 @@ enum UserType {NGO, END_USER} UserType ut;
         Auction memory auction = Auction({
             auctionId : _auctionId,
             totalIncentive : _totalIncentive,
-            litreGoalSavings : litreGoalSavings,
+            wattHourGoalSavings : _wattHourGoalSavings,
             bidStartTimestamp : _bidStartTimestamp,
             bidEndTimestamp : _bidEndTimestamp,
             offStartTimestamp : _offStartTimestamp,
             offEndTimeStamp : _offEndTimeStamp
-        });
+            });
         for (uint i = 0; i<_users.length; i++) {
             auctionSelectedUsers[_auctionId][_users[i]] = true;
         }
@@ -124,16 +130,16 @@ enum UserType {NGO, END_USER} UserType ut;
         uint256 _timestampFrom, uint256 _timestampTo, uint256 _watt) public {
         Auction memory auction = auctionRegistry[_auctionId];
         //check for time
-         uint256 currentTimestamp = block.timestamp;
+        uint256 currentTimestamp = block.timestamp;
 
-         require((auction.bidStartTimestamp<=currentTimestamp&&auction.bidEndTimestamp>=currentTimestamp),
-             "Bid time has passed for auction");
-         require(( _timestampFrom>=auction.offStartTimestamp&&_timestampFrom<=auction.offEndTimeStamp),
-             "Off Start time should fall under auction off timestamp");
-         require(( _timestampTo>=auction.offStartTimestamp && _timestampTo<=auction.offEndTimeStamp),
-             "Off Start time should fall under auction off timestamp");
-         //require(( _timestampTo-_timestampFrom > 600000),"Duration should be more than 10 minutes");
-         //require(_bidAmount < 2,"Max Bid Amount is 2 tokens");
+        require((auction.bidStartTimestamp<=currentTimestamp&&auction.bidEndTimestamp>=currentTimestamp),
+            "Bid time has passed for auction");
+        require(( _timestampFrom>=auction.offStartTimestamp&&_timestampFrom<=auction.offEndTimeStamp),
+            "Off Start time should fall under auction off timestamp");
+        require(( _timestampTo>=auction.offStartTimestamp && _timestampTo<=auction.offEndTimeStamp),
+            "Off Start time should fall under auction off timestamp");
+        //require(( _timestampTo-_timestampFrom > 600000),"Duration should be more than 10 minutes");
+        //require(_bidAmount < 2,"Max Bid Amount is 2 tokens");
 
         Bid memory bid = Bid ({
             bidId : _bidId,
@@ -142,21 +148,21 @@ enum UserType {NGO, END_USER} UserType ut;
             timestampFrom : _timestampFrom,
             timestampTo : _timestampTo,
             watt : _watt
-        });
+            });
         bidRegistry[_bidId] = bid;
         auctionBidIdsRegistry[_auctionId].push(_bidId);
     }
 
-    
+
 
     function registerDeviceUsage (bytes32 _usageId, uint256 _watt) public{
         bytes32 _deviceId = userRegistry[msg.sender].device.deviceId;
         DeviceUsage memory deviceUsage = DeviceUsage ({
-             deviceId : _deviceId,
-             timestamp: block.timestamp,
-             watt:_watt,
-             usageId : _usageId
-        });
+            deviceId : _deviceId,
+            timestamp: block.timestamp,
+            watt:_watt,
+            usageId : _usageId
+            });
         deviceStatsRegistry[_usageId] = deviceUsage;
         emit DeviceUsageRegistered(_usageId, _deviceId, block.timestamp, _watt);
     }
@@ -170,18 +176,18 @@ enum UserType {NGO, END_USER} UserType ut;
 
     function getAuction(bytes32 _auctionId) public returns (bytes32, uint256, uint256, uint256, uint256, uint256, uint256) {
         Auction memory auction = auctionRegistry[_auctionId];
-        return (auction.auctionId, auction.totalIncentive, 
-            auction.wattHourGoalSavings, auction.bidStartTimestamp, 
-            auction.bidEndTimestamp, auction.offStartTimestamp, auction.offEndTimeStamp);
+        return (auction.auctionId, auction.totalIncentive,
+        auction.wattHourGoalSavings, auction.bidStartTimestamp,
+        auction.bidEndTimestamp, auction.offStartTimestamp, auction.offEndTimeStamp);
     }
 
     function getAuctionBids (bytes32 _auctionId)  public returns (bytes32[] memory, uint256[] memory, uint256[] memory) {
         //check if bid duration is closed
         Auction memory auction = auctionRegistry[_auctionId];
-        
-        require ((auction.bidStartTimestamp < block.timestamp && block.timestamp > auction.bidEndTimestamp), 
-        "Bids should be fetched after bid is closed");
-        
+
+        require ((auction.bidStartTimestamp < block.timestamp && block.timestamp > auction.bidEndTimestamp),
+            "Bids should be fetched after bid is closed");
+
         bytes32[] memory bidIds = auctionBidIdsRegistry[_auctionId];
         uint256[] memory bidAmount = new uint256[](bidIds.length);
         uint256[] memory wattHour = new uint256[](bidIds.length);
@@ -197,7 +203,7 @@ enum UserType {NGO, END_USER} UserType ut;
     }
 
     // function getDeviceUsage (bytes32 _deviceId)  public view returns (uint256[] memory, uint256[] memory) {
-        
+
     //     DeviceUsage[] memory deviceUsages = deviceStatsRegistry[_deviceId];
     //     uint256[] memory timestamp = new uint256[](deviceUsages.length);
     //     uint256[] memory watt = new uint256[](deviceUsages.length);
@@ -205,7 +211,7 @@ enum UserType {NGO, END_USER} UserType ut;
     //     for(uint i = 0; i<deviceUsages.length; i++) {
     //         timestamp[i] = deviceUsages[i].timestamp;
     //         watt[i] = deviceUsages[i].watt;
-            
+
     //     }
     //     return (timestamp, watt);
     // }
@@ -268,10 +274,10 @@ enum UserType {NGO, END_USER} UserType ut;
         uint256 totalPayout = 0;
         uint256 totalSavings = 0;
         for(uint i = 0; i<_bidIds.length; i++){
-             Bid memory bid = bidRegistry[_bidIds[i]];
-             balanceRegistry[msg.sender] = balanceRegistry[msg.sender].sub(bid.bidAmount);
-             balanceRegistry[bid.userAddress] = balanceRegistry[bid.userAddress].add(bid.bidAmount);
-             totalPayout += bid.bidAmount;
+            Bid memory bid = bidRegistry[_bidIds[i]];
+            balanceRegistry[msg.sender] = balanceRegistry[msg.sender].sub(bid.bidAmount);
+            balanceRegistry[bid.userAddress] = balanceRegistry[bid.userAddress].add(bid.bidAmount);
+            totalPayout += bid.bidAmount;
         }
         for(uint256 i = 0; i<_usageIds.length; i++){
             DeviceUsage memory deviceUsage = deviceStatsRegistry[_usageIds[i]];
@@ -280,12 +286,12 @@ enum UserType {NGO, END_USER} UserType ut;
         emit PledgeSuccessful(_auctionId, totalSavings, totalPayout);
     }
 
-    
+
 
     //getter functions
     // function getUserRegistry(bytes32 _userId) public view  returns ( bytes32,address)  {
     //     return (userRegistry[_userId].userId, userRegistry[_userId].userAddress);
     // }
 
-  
+
 }
